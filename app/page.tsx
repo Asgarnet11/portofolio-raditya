@@ -159,7 +159,7 @@ export default function App() {
                 technologies: ["Next.js", "Tailwind CSS", "React", "Laravel"],
                 liveDemo: "https://galery-kenangan-kkp1.vercel.app/",
                 sourceCode: "https://github.com/Asgarnet11/",
-                imageUrl: "https://placehold.co/600x400/1a202c/9f7aea?text=Project+Image"
+                imageUrl: "/photo/project1.png"
             },
         ],
     };
