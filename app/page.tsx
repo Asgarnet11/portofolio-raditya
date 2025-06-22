@@ -247,7 +247,7 @@ export default function App() {
                 >
                     <div className="flex justify-end p-6">
                         <button onClick={() => setIsMenuOpen(false)} className="text-white">
-                            <X size={30} />
+                            <X width={30} height={30} />
                         </button>
                     </div>
                     <nav className="flex flex-col items-center justify-center h-full space-y-8">
