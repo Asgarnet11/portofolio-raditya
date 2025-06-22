@@ -110,7 +110,7 @@ export default function App() {
 
     const portfolioData = {
         name: "Raditya Armanda",
-        headline: " Web Developer | Spesialis Next.js & Laravel",
+        headline: " WWeb Developer | Spesialis Next.js & Laravel",
         photoPlaceholder: "RA",
         about: {
             bio: "Saya adalah seorang Full-Stack Web Developer dari Kendari, Indonesia, dengan fokus pada pembuatan aplikasi web yang modern dan responsif. Menggabungkan keahlian mendalam pada ekosistem JavaScript dan PHP, saya mampu membangun solusi digital end-to-end yang solid dan efisien.",
