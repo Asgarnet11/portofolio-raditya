@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+type IconProps = React.SVGProps<SVGSVGElement>;
 
-const Github = (props: any) => (
+const Github = (props: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -19,7 +20,7 @@ const Github = (props: any) => (
     <path d="M9 18c-4.51 2-5-2-7-2" />
   </svg>
 );
-const Mail = (props: any) => (
+const Mail = (props: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -36,7 +37,7 @@ const Mail = (props: any) => (
     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
   </svg>
 );
-const ExternalLink = (props: any) => (
+const ExternalLink = (props: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -54,7 +55,7 @@ const ExternalLink = (props: any) => (
     <line x1="10" y1="14" x2="21" y2="3" />
   </svg>
 );
-const ArrowUp = (props: any) => (
+const ArrowUp = (props: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -71,7 +72,7 @@ const ArrowUp = (props: any) => (
     <path d="M12 19V5" />
   </svg>
 );
-const Menu = (props: any) => (
+const Menu = (props: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -89,7 +90,7 @@ const Menu = (props: any) => (
     <line x1="4" x2="20" y1="18" y2="18" />
   </svg>
 );
-const X = (props: any) => (
+const X = (props: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -107,7 +108,7 @@ const X = (props: any) => (
   </svg>
 );
 
-const CodeIcon = (props: any) => (
+const CodeIcon = (props: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -124,7 +125,7 @@ const CodeIcon = (props: any) => (
     <polyline points="8 6 2 12 8 18" />
   </svg>
 );
-const PuzzleIcon = (props: any) => (
+const PuzzleIcon = (props: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -140,7 +141,7 @@ const PuzzleIcon = (props: any) => (
     <path d="M14 7V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2v-2a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-4a2 2 0 0 1-2-2z" />
   </svg>
 );
-const HandshakeIcon = (props: any) => (
+const HandshakeIcon = (props: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -616,7 +617,7 @@ export default function App() {
         </main>
 
         <footer className="text-center py-8 mt-16 md:mt-24">
-          <AnimatedSection id="contact" className="pt-20">
+          <AnimatedSection className="pt-20">
             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Mari Berkolaborasi
             </h3>
