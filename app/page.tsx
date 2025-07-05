@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 
 const Github = (props) => (
   <svg
@@ -159,195 +159,99 @@ const HandshakeIcon = (props) => (
   </svg>
 );
 
-// --- Custom Hooks ---
 const useTypingEffect = (text, speed = 100) => {
   const [displayedText, setDisplayedText] = useState("");
   useEffect(() => {
-    setDisplayedText(""); // Reset on text change
-    if (text) {
-      let i = 0;
-      const typingInterval = setInterval(() => {
-        if (i < text.length) {
-          setDisplayedText((prev) => prev + text.charAt(i));
-          i++;
-        } else {
-          clearInterval(typingInterval);
-        }
-      }, speed);
-      return () => clearInterval(typingInterval);
-    }
+    let i = 0;
+    setDisplayedText("");
+    const typingInterval = setInterval(() => {
+      if (i < text.length) {
+        setDisplayedText((prev) => prev + text.charAt(i));
+        i++;
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, speed);
+    return () => clearInterval(typingInterval);
   }, [text, speed]);
   return displayedText;
 };
 
-const useScrollSpy = (ids, options) => {
-  const [activeId, setActiveId] = useState();
-  const observer = useRef();
+const AnimatedSection = ({ children, className = "" }) => {
+  const ref = React.useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const elements = ids.map((id) => document.getElementById(id));
-    observer.current?.disconnect();
-    observer.current = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry?.isIntersecting) {
-          setActiveId(entry.target.id);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
         }
-      });
-    }, options);
-    elements.forEach((el) => {
-      if (el) observer.current?.observe(el);
-    });
-    return () => observer.current?.disconnect();
-  }, [ids, options]);
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, []);
 
-  return activeId;
+  return (
+    <section
+      ref={ref}
+      className={`${className} transition-opacity duration-1000 ease-in ${
+        isVisible ? "opacity-100" : "opacity-0 translate-y-5"
+      }`}
+    >
+      {children}
+    </section>
+  );
 };
 
-// --- Reusable Components ---
-const AnimatedSection = React.forwardRef(
-  ({ children, className = "", id }, ref) => {
-    const internalRef = useRef(null);
-    const [isVisible, setIsVisible] = useState(false);
-
-    useEffect(() => {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.unobserve(entry.target);
-          }
-        },
-        { threshold: 0.1 }
-      );
-
-      const currentRef = internalRef.current;
-      if (currentRef) {
-        observer.observe(currentRef);
-      }
-
-      return () => {
-        if (currentRef) {
-          observer.unobserve(currentRef);
-        }
-      };
-    }, []);
-
-    return (
-      <section
-        id={id}
-        ref={internalRef}
-        className={`${className} transition-all duration-1000 ease-in ${
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-        }`}
-      >
-        {children}
-      </section>
-    );
-  }
-);
-AnimatedSection.displayName = "AnimatedSection";
-
-const ProjectCard = ({ project, index }) => (
-  <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-center bg-gray-800/40 p-6 md:p-8 rounded-lg border border-gray-700/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:border-purple-500/50 hover:-translate-y-2">
-    <div
-      className={`md:col-span-2 ${
-        index % 2 === 0 ? "md:order-1" : "md:order-2"
-      }`}
-    >
-      <a
-        href={project.liveDemo}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Live demo of ${project.title}`}
-      >
-        <img
-          src={project.imageUrl}
-          alt={`Screenshot of ${project.title}`}
-          className="rounded-lg shadow-lg w-full h-auto object-cover aspect-video"
-          loading="lazy"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = `https://placehold.co/600x400/1a202c/9f7aea?text=${encodeURIComponent(
-              project.title
-            )}`;
-          }}
-        />
-      </a>
-    </div>
-    <div
-      className={`md:col-span-3 ${
-        index % 2 === 0 ? "md:order-2" : "md:order-1"
-      }`}
-    >
-      <h4 className="text-2xl font-bold text-purple-400 mb-2">
-        {project.title}
-      </h4>
-      <p className="text-gray-400 mb-4">{project.description}</p>
-      <p className="text-gray-400 mb-4">
-        <strong className="text-gray-200">Challenge:</strong>{" "}
-        {project.challenge}
-      </p>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {project.technologies.map((tech) => (
-          <span
-            key={tech}
-            className="bg-gray-700 text-purple-300 text-sm font-medium px-3 py-1 rounded-full"
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-4">
-        <a
-          href={project.liveDemo}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-transform transform hover:scale-105 duration-300"
-        >
-          Live Demo <ExternalLink className="ml-2 h-4 w-4" />
-        </a>
-        <a
-          href={project.sourceCode}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center text-gray-400 hover:text-white font-semibold py-2 px-4 border border-gray-600 rounded-lg transition-colors duration-300 hover:bg-gray-700"
-        >
-          Source Code <Github className="ml-2 h-4 w-4" />
-        </a>
-      </div>
-    </div>
-  </div>
-);
-
-// --- Main App Component ---
-export default function PortfolioPage() {
+// --- Komponen Utama ---
+export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const portfolioData = {
     name: "Asgar Fatwahyudi",
-    headline: "Full-Stack Web Developer", // Corrected typo
+    headline: "JJunior Web Developer",
     photoPlaceholder: "AF",
     about: {
-      bio: "I am a Full-Stack Web Developer from Kendari, Indonesia, with a passion for creating modern and responsive web applications. By combining deep expertise in the JavaScript and PHP ecosystems, I build solid and efficient end-to-end digital solutions.",
+      bio: "Saya adalah seorang Full-Stack Web Developer dari Kendari, Indonesia, dengan fokus pada pembuatan aplikasi web yang modern dan responsif. Menggabungkan keahlian mendalam pada ekosistem JavaScript dan PHP, saya mampu membangun solusi digital end-to-end yang solid dan efisien.",
       highlights: [
         {
           icon: "CodeIcon",
-          title: "End-to-End Development",
+          title: "Pengembangan End-to-End",
           description:
-            "Transforming ideas into finished products, from interface design to complex backend logic.",
+            "Mengubah ide menjadi produk jadi, dari desain antarmuka hingga logika backend yang kompleks.",
         },
         {
           icon: "PuzzleIcon",
-          title: "Problem Solver",
+          title: "Pemecah Masalah",
           description:
-            "Enjoying the challenge of finding clean and efficient solutions to complex technical problems.",
+            "Menikmati tantangan untuk menemukan solusi yang bersih dan efisien untuk masalah teknis yang rumit.",
         },
         {
           icon: "HandshakeIcon",
-          title: "Open to Collaboration",
+          title: "Terbuka untuk Kolaborasi",
           description:
-            "Actively seeking freelance opportunities, full-time positions, and collaboration on open-source projects.",
+            "Aktif mencari peluang freelance, posisi full-time, dan kolaborasi dalam proyek open source.",
         },
       ],
     },
@@ -357,31 +261,28 @@ export default function PortfolioPage() {
     },
     skills: [
       {
-        category: "Languages",
-        items: ["JavaScript (ES6+)", "PHP 8"],
+        category: "Bahasa Pemrograman",
+        items: ["JavaScript", "PHP"],
       },
       {
         category: "Frontend",
         items: ["Next.js", "React", "Tailwind CSS", "HTML5", "CSS3"],
       },
-      {
-        category: "Backend",
-        items: ["Laravel", "Express.js", "Node.js"],
-      },
-      { category: "Databases", items: ["PostgreSQL", "MySQL"] },
+      { category: "Backend", items: ["Laravel 12", "Express.js", "Node.js"] },
+      { category: "Database", items: ["PostgreSQL", "MySQL"] },
       {
         category: "Tools & Deployment",
-        items: ["Git", "GitHub", "Docker", "Vercel", "Cpanel"],
+        items: ["Cpanel", "GitHub", "Docker", "Vercel"],
       },
     ],
     projects: [
       {
         title: "Galeri Kenangan KKP",
         description:
-          "An interactive photo gallery web application that allows users to upload, view, and interact with memory albums. This project was created to document moments during a Professional Work Practice (KKP).",
+          "Sebuah aplikasi web galeri foto interaktif yang memungkinkan pengguna untuk mengunggah, melihat, dan berinteraksi dengan album kenangan. Proyek ini dibuat untuk mendokumentasikan momen-momen selama kegiatan Kuliah Kerja Profesi (KKP).",
         challenge:
-          "The challenge was to build a responsive and fast interface to display many images without sacrificing performance, implementing lazy loading and optimized image formats.",
-        technologies: ["Next.js", "Tailwind CSS", "React", "Vercel"],
+          "Tantangannya adalah membangun antarmuka yang responsif dan cepat untuk menampilkan banyak gambar tanpa mengorbankan performa",
+        technologies: ["Next.js", "Tailwind CSS", "React"],
         liveDemo: "https://galery-kenangan-kkp1.vercel.app/",
         sourceCode: "https://github.com/Asgarnet11/galery-kenangan-kkp.git",
         imageUrl: "/photo/project1.png",
@@ -389,21 +290,21 @@ export default function PortfolioPage() {
       {
         title: "Sistem Informasi Pelaporan Narkoba",
         description:
-          "A secure community portal for public complaints with well-structured report classification, enabling officers to manage reports easily, quickly, and accurately.",
+          "Sebuh Portal Masyarakat Untuk Pengaduan Masyarakat Yang aman dengan pengelolaan klasfikasi laporan yang tersusun rapih dan membuat petugas mampu mengelola laporan dengan mudah, cepat, dan tepat",
         challenge:
-          "Developing a secure authentication and authorization system to protect sensitive data while ensuring a user-friendly reporting process.",
-        technologies: ["Laravel", "MySQL", "Tailwind CSS"],
+          "Tantangannya adalah membangun antarmuka yang responsif dan cepat untuk menampilkan banyak gambar tanpa mengorbankan performa",
+        technologies: ["Laravel", "Tailwind CSS"],
         liveDemo: "https://si-lapor.project-site.my.id/",
         sourceCode: "https://github.com/Asgarnet11/Pengaduan-narkoba.git",
         imageUrl: "/photo/project2.png",
       },
       {
-        title: "Sistem Informasi Pertanian",
+        title: "Sistem Informasi Pelaporan Narkoba",
         description:
-          "An Agricultural Information System for the community of Unaasi Village, focusing on the agricultural sector, with plans for future feature expansion and integration.",
+          "Sistem Informasi Pertanian Untuk Masyarakat Kelurahan Unaasi yang bergerak di bidang pertanian yang kedepanya mungkin akan lebih banyak fitur yang dapat di kembangkan",
         challenge:
-          "The main challenge was to build a responsive interface and develop SEO-friendly features to ensure high visibility and accessibility for the local community.",
-        technologies: ["Laravel", "Tailwind CSS", "SEO"],
+          "Tantangannya adalah membangun antarmuka yang responsif dan cepat Serta mengembangkan beberapa fitur yang di tampilkan dengan SEO",
+        technologies: ["Laravel", "Tailwind CSS"],
         liveDemo: "https://agriunaasi.project-site.my.id/",
         sourceCode: "https://github.com/Asgarnet11/Sistem-Pertanian.git",
         imageUrl: "/photo/project3.png",
@@ -412,11 +313,10 @@ export default function PortfolioPage() {
   };
 
   const navLinks = [
-    { href: "#hero", label: "Home" },
-    { href: "#about", label: "About" },
-    { href: "#skills", label: "Skills" },
-    { href: "#projects", label: "Projects" },
-    { href: "#contact", label: "Contact" },
+    { href: "#about", label: "Tentang" },
+    { href: "#skills", label: "Keahlian" },
+    { href: "#projects", label: "Proyek" },
+    { href: "#contact", label: "Kontak" },
   ];
 
   const highlightIcons = {
@@ -426,54 +326,33 @@ export default function PortfolioPage() {
   };
 
   const animatedHeadline = useTypingEffect(portfolioData.headline, 50);
-  const activeSection = useScrollSpy(
-    ["hero", "about", "skills", "projects", "contact"],
-    { rootMargin: "-30% 0px -70% 0px" }
-  );
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const toggleMenu = useCallback(() => {
-    setIsMenuOpen((prev) => !prev);
-  }, []);
 
   return (
     <>
-      <style jsx global>{`
-        html {
-          scroll-behavior: smooth;
-        }
-        @keyframes typing-cursor {
-          from {
-            border-right-color: rgba(192, 132, 252, 1);
-          }
-          to {
-            border-right-color: transparent;
-          }
-        }
-        .typing-cursor::after {
-          content: "";
-          display: inline-block;
-          width: 3px;
-          height: 1em;
-          background-color: rgba(192, 132, 252, 1);
-          animation: typing-cursor 0.8s infinite;
-          vertical-align: middle;
-          margin-left: 4px;
-        }
-        body {
-          background-color: #111827; /* bg-gray-900 */
-        }
-      `}</style>
+      {/* CSS & Style Global */}
+      <style>{`
+                html { scroll-behavior: smooth; }
+                @keyframes typing-cursor {
+                    from { border-right-color: rgba(192, 132, 252, 1); }
+                    to { border-right-color: transparent; }
+                }
+                .typing-cursor {
+                    border-right: 3px solid rgba(192, 132, 252, 1);
+                    animation: typing-cursor 0.8s infinite;
+                }
+                .staggered-fade-in {
+                    opacity: 0;
+                    transform: translateY(20px);
+                    animation: fadeIn 0.8s forwards;
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
 
       <div className="bg-gray-900 text-gray-200 font-sans leading-relaxed">
-        {/* --- Header --- */}
+        {/* --- Navbar --- */}
         <header
           className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
             isScrolled
@@ -484,32 +363,24 @@ export default function PortfolioPage() {
           <div className="container mx-auto px-6 py-4 flex justify-between items-center">
             <a
               href="#hero"
-              className="text-2xl font-bold text-white hover:text-purple-400 transition-colors"
+              className="text-xl font-bold text-white hover:text-purple-400 transition-colors"
             >
-              AF.
+              RA.
             </a>
             <nav className="hidden md:flex space-x-6">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className={`capitalize text-gray-300 hover:text-purple-400 transition-colors relative ${
-                    activeSection === link.href.substring(1)
-                      ? "text-purple-400"
-                      : ""
-                  }`}
+                  className="text-gray-300 hover:text-purple-400 transition-colors"
                 >
                   {link.label}
-                  {activeSection === link.href.substring(1) && (
-                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-purple-400"></span>
-                  )}
                 </a>
               ))}
             </nav>
             <button
               className="md:hidden text-white"
-              onClick={toggleMenu}
-              aria-label="Open menu"
+              onClick={() => setIsMenuOpen(true)}
             >
               <Menu />
             </button>
@@ -518,22 +389,21 @@ export default function PortfolioPage() {
 
         {/* --- Mobile Menu --- */}
         <div
-          className={`fixed inset-0 bg-gray-900/95 backdrop-blur-sm z-50 transform ${
+          className={`fixed inset-0 bg-gray-900 z-50 transform ${
             isMenuOpen ? "translate-x-0" : "translate-x-full"
           } transition-transform duration-300 md:hidden`}
-          aria-hidden={!isMenuOpen}
         >
           <div className="flex justify-end p-6">
-            <button onClick={toggleMenu} className="text-white">
-              <X size={30} aria-label="Close menu" />
+            <button onClick={() => setIsMenuOpen(false)} className="text-white">
+              <X size={30} />
             </button>
           </div>
-          <nav className="flex flex-col items-center justify-center h-full -mt-16 space-y-8">
+          <nav className="flex flex-col items-center justify-center h-full space-y-8">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                onClick={toggleMenu}
+                onClick={() => setIsMenuOpen(false)}
                 className="text-3xl text-gray-300 hover:text-purple-400 transition-colors"
               >
                 {link.label}
@@ -546,18 +416,18 @@ export default function PortfolioPage() {
           {/* --- Hero Section --- */}
           <section
             id="hero"
-            className="flex flex-col-reverse md:flex-row items-center justify-between min-h-[70vh] gap-12"
+            className="flex flex-col-reverse md:flex-row items-center justify-between min-h-[70vh]"
           >
             <div className="md:w-3/5 text-center md:text-left mt-10 md:mt-0">
               <h1 className="text-5xl lg:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 mb-3">
                 {portfolioData.name}
               </h1>
-              <h2 className="text-2xl md:text-3xl font-light text-purple-300 mb-6 h-16 md:h-auto">
+              <h2 className="text-2xl md:text-2xl font-light text-purple-300 mb-3 h-16 md:h-16">
                 <span className="typing-cursor">{animatedHeadline}</span>
               </h2>
-              <p className="max-w-xl text-gray-400 mb-8 text-base md:text-lg">
-                Building functional and modern web applications from idea to
-                deployment.
+              <p className="max-w-xl text-gray-400 mb-5 text-base md:text-lg">
+                Membangun aplikasi web yang fungsional dan modern dari ide
+                hingga ke tahap deployment.
               </p>
               <div className="flex items-center justify-center md:justify-start space-x-4">
                 <a
@@ -565,34 +435,30 @@ export default function PortfolioPage() {
                   className="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 duration-300"
                 >
                   <Mail className="mr-2 h-5 w-5" />
-                  Contact Me
+                  Hubungi Saya
                 </a>
                 <a
                   href={portfolioData.contact.github}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-gray-400 hover:text-white transition-colors duration-300"
-                  aria-label="GitHub Profile"
                 >
                   <Github className="h-8 w-8" />
                 </a>
               </div>
             </div>
-            <div className="relative w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full blur-2xl opacity-50"></div>
-              <div className="w-full h-full bg-gray-800 border-4 border-purple-500 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/20 relative">
-                <span className="text-6xl md:text-7xl font-bold text-gray-500">
-                  {portfolioData.photoPlaceholder}
-                </span>
-              </div>
+            <div className="w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 bg-gray-800 border-4 border-purple-500 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <span className="text-6xl md:text-7xl font-bold text-gray-500">
+                {portfolioData.photoPlaceholder}
+              </span>
             </div>
           </section>
 
           <div className="space-y-24 md:space-y-32 mt-24 md:mt-16">
-            {/* --- About Me Section --- */}
-            <AnimatedSection id="about" className="pt-20">
+            {/* --- Bagian "Tentang Saya" yang Diperbarui --- */}
+            <AnimatedSection className="pt-20" id="about">
               <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">
-                About Me
+                Tentang Saya
               </h3>
               <p className="text-lg text-gray-400 max-w-3xl mx-auto text-center mb-16">
                 {portfolioData.about.bio}
@@ -604,7 +470,8 @@ export default function PortfolioPage() {
                   return (
                     <div
                       key={index}
-                      className="bg-gray-800/80 p-6 rounded-lg border border-gray-700/50 text-center transition-all duration-300 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-2"
+                      className="bg-gray-800/80 p-6 rounded-lg border border-gray-700/50 text-center transition-all duration-300 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-2 staggered-fade-in"
+                      style={{ animationDelay: `${index * 100}ms` }}
                     >
                       <div className="flex justify-center mb-4">
                         <div className="bg-purple-600/20 p-4 rounded-full">
@@ -623,10 +490,9 @@ export default function PortfolioPage() {
               </div>
             </AnimatedSection>
 
-            {/* --- Skills Section --- */}
-            <AnimatedSection id="skills" className="pt-20">
+            <AnimatedSection className="pt-20" id="skills">
               <h3 className="text-3xl md:text-4xl font-bold text-white mb-12 text-center">
-                Skills & Technologies
+                Keahlian & Teknologi
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {portfolioData.skills.map((skillCategory) => (
@@ -649,29 +515,98 @@ export default function PortfolioPage() {
               </div>
             </AnimatedSection>
 
-            {/* --- Projects Section --- */}
-            <AnimatedSection id="projects" className="pt-20">
+            <AnimatedSection className="pt-20" id="projects">
               <h3 className="text-3xl md:text-4xl font-bold text-white mb-12 text-center">
-                Featured Projects
+                Proyek Unggulan
               </h3>
               <div className="space-y-16">
                 {portfolioData.projects.map((project, index) => (
-                  <ProjectCard key={index} project={project} index={index} />
+                  <div
+                    key={index}
+                    className="grid grid-cols-1 md:grid-cols-5 gap-8 items-center bg-gray-800/40 p-6 md:p-8 rounded-lg border border-gray-700/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 hover:border-purple-500/50 hover:-translate-y-2"
+                  >
+                    <div
+                      className={`md:col-span-2 ${
+                        index % 2 === 0 ? "md:order-1" : "md:order-2"
+                      }`}
+                    >
+                      <a
+                        href={project.liveDemo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          src={project.imageUrl}
+                          alt={`Screenshot dari proyek ${project.title}`}
+                          className="rounded-lg shadow-lg w-full h-auto object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src =
+                              "https://placehold.co/600x400/1a202c/9f7aea?text=Image+Not+Found";
+                          }}
+                        />
+                      </a>
+                    </div>
+                    <div
+                      className={`md:col-span-3 ${
+                        index % 2 === 0 ? "md:order-2" : "md:order-1"
+                      }`}
+                    >
+                      <h4 className="text-2xl font-bold text-purple-400 mb-2">
+                        {project.title}
+                      </h4>
+                      <p className="text-gray-400 mb-4">
+                        {project.description}
+                      </p>
+                      <p className="text-gray-400 mb-4">
+                        <strong className="text-gray-200">Tantangan:</strong>{" "}
+                        {project.challenge}
+                      </p>
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        {project.technologies.map((tech) => (
+                          <span
+                            key={tech}
+                            className="bg-gray-700 text-purple-300 text-sm font-medium px-3 py-1 rounded-full"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex space-x-4">
+                        <a
+                          href={project.liveDemo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-transform transform hover:scale-105 duration-300"
+                        >
+                          Live Demo <ExternalLink className="ml-2 h-4 w-4" />
+                        </a>
+                        <a
+                          href={project.sourceCode}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-gray-400 hover:text-white font-semibold py-2 px-4 border border-gray-600 rounded-lg transition-colors duration-300 hover:bg-gray-700"
+                        >
+                          Source Code <Github className="ml-2 h-4 w-4" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             </AnimatedSection>
           </div>
         </main>
 
-        {/* --- Footer & Contact --- */}
+        {/* --- Footer & Kontak --- */}
         <footer className="text-center py-8 mt-16 md:mt-24">
           <AnimatedSection id="contact" className="pt-20">
             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Let's Collaborate
+              Mari Berkolaborasi
             </h3>
             <p className="text-gray-400 max-w-xl mx-auto mb-8 px-4">
-              I'm interested in all kinds of projects. If you have an idea you
-              want to bring to life, don't hesitate to get in touch.
+              Saya tertarik dengan berbagai macam proyek. Jika Anda memiliki ide
+              yang ingin diwujudkan, jangan ragu untuk menghubungi saya.
             </p>
             <a
               href={`mailto:${portfolioData.contact.email}`}
@@ -682,19 +617,19 @@ export default function PortfolioPage() {
           </AnimatedSection>
           <div className="border-t border-gray-800 pt-6 mt-16">
             <p className="text-gray-500">
-              Designed & Built by Asgar Fatwahyudi &copy;{" "}
+              Didesain dan Dibangun oleh Asgar Fatwahyudi&copy;{""}
               {new Date().getFullYear()}
             </p>
           </div>
         </footer>
 
-        {/* --- Scroll to Top Button --- */}
+        {/* --- Tombol Scroll to Top --- */}
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className={`fixed bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 ${
             isScrolled ? "opacity-100" : "opacity-0"
           }`}
-          aria-label="Scroll back to top"
+          aria-label="Kembali ke atas"
         >
           <ArrowUp />
         </button>
