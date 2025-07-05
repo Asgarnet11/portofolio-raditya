@@ -1,8 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
+<<<<<<< HEAD
 // --- Ikon SVG ---
 const Github = (props: any) => (
+=======
+const Github = (props) => (
+>>>>>>> 657c835f7ca9e6018f453782fe7fcc88444f0a7d
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -106,8 +110,12 @@ const X = (props: any) => (
     <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
 );
+<<<<<<< HEAD
 // --- Ikon Baru untuk Bagian "Tentang Saya" ---
 const CodeIcon = (props: any) => (
+=======
+const CodeIcon = (props) => (
+>>>>>>> 657c835f7ca9e6018f453782fe7fcc88444f0a7d
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -182,7 +190,6 @@ const useTypingEffect = (text, speed = 100) => {
   return displayedText;
 };
 
-// Komponen untuk Animasi Fade-In saat scroll
 const AnimatedSection = ({ children, className = "" }) => {
   const ref = React.useRef(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -204,7 +211,6 @@ const AnimatedSection = ({ children, className = "" }) => {
     }
     return () => {
       if (ref.current) {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(ref.current);
       }
     };
