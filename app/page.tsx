@@ -553,9 +553,12 @@ export default function App() {
                           src={project.imageUrl}
                           alt={`Screenshot dari proyek ${project.title}`}
                           className="rounded-lg shadow-lg w-full h-auto object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src =
+                          onError={(
+                            e: React.SyntheticEvent<HTMLImageElement>
+                          ) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src =
                               "https://placehold.co/600x400/1a202c/9f7aea?text=Image+Not+Found";
                           }}
                         />
