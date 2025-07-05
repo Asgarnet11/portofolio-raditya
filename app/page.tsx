@@ -504,7 +504,7 @@ export default function App() {
               </div>
             </AnimatedSection>
 
-            <AnimatedSection className="pt-20" id="skills">
+            <AnimatedSection className="pt-20">
               <h3 className="text-3xl md:text-4xl font-bold text-white mb-12 text-center">
                 Keahlian & Teknologi
               </h3>
@@ -529,7 +529,7 @@ export default function App() {
               </div>
             </AnimatedSection>
 
-            <AnimatedSection className="pt-20" id="projects">
+            <AnimatedSection className="pt-20">
               <h3 className="text-3xl md:text-4xl font-bold text-white mb-12 text-center">
                 Proyek Unggulan
               </h3>
