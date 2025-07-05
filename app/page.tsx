@@ -611,7 +611,6 @@ export default function App() {
           </div>
         </main>
 
-        {/* --- Footer & Kontak --- */}
         <footer className="text-center py-8 mt-16 md:mt-24">
           <AnimatedSection id="contact" className="pt-20">
             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -636,7 +635,6 @@ export default function App() {
           </div>
         </footer>
 
-        {/* --- Tombol Scroll to Top --- */}
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className={`fixed bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 ${
