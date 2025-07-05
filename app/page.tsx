@@ -161,9 +161,6 @@ const HandshakeIcon = (props) => (
   </svg>
 );
 
-// --- Hook & Komponen Tambahan ---
-
-// Hook untuk Efek Ketik
 const useTypingEffect = (text, speed = 100) => {
   const [displayedText, setDisplayedText] = useState("");
   useEffect(() => {
