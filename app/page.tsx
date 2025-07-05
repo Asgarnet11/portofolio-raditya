@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-const Github = (props) => (
+const Github = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -18,7 +18,7 @@ const Github = (props) => (
     <path d="M9 18c-4.51 2-5-2-7-2" />
   </svg>
 );
-const Mail = (props) => (
+const Mail = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -35,7 +35,7 @@ const Mail = (props) => (
     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
   </svg>
 );
-const ExternalLink = (props) => (
+const ExternalLink = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -53,7 +53,7 @@ const ExternalLink = (props) => (
     <line x1="10" y1="14" x2="21" y2="3" />
   </svg>
 );
-const ArrowUp = (props) => (
+const ArrowUp = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -70,7 +70,7 @@ const ArrowUp = (props) => (
     <path d="M12 19V5" />
   </svg>
 );
-const Menu = (props) => (
+const Menu = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -88,7 +88,7 @@ const Menu = (props) => (
     <line x1="4" x2="20" y1="18" y2="18" />
   </svg>
 );
-const X = (props) => (
+const X = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -105,7 +105,8 @@ const X = (props) => (
     <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
 );
-const CodeIcon = (props) => (
+
+const CodeIcon = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -122,7 +123,7 @@ const CodeIcon = (props) => (
     <polyline points="8 6 2 12 8 18" />
   </svg>
 );
-const PuzzleIcon = (props) => (
+const PuzzleIcon = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -138,7 +139,7 @@ const PuzzleIcon = (props) => (
     <path d="M14 7V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2v-2a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-4a2 2 0 0 1-2-2z" />
   </svg>
 );
-const HandshakeIcon = (props) => (
+const HandshakeIcon = (props: any) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -159,7 +160,10 @@ const HandshakeIcon = (props) => (
   </svg>
 );
 
-const useTypingEffect = (text, speed = 100) => {
+// --- Hook & Komponen Tambahan ---
+
+// Hook untuk Efek Ketik
+const useTypingEffect = (text: string, speed = 100) => {
   const [displayedText, setDisplayedText] = useState("");
   useEffect(() => {
     let i = 0;
@@ -177,7 +181,13 @@ const useTypingEffect = (text, speed = 100) => {
   return displayedText;
 };
 
-const AnimatedSection = ({ children, className = "" }) => {
+const AnimatedSection = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
   const ref = React.useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -456,7 +466,7 @@ export default function App() {
 
           <div className="space-y-24 md:space-y-32 mt-24 md:mt-16">
             {/* --- Bagian "Tentang Saya" yang Diperbarui --- */}
-            <AnimatedSection className="pt-20" id="about">
+            <AnimatedSection className="pt-20">
               <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">
                 Tentang Saya
               </h3>
@@ -466,7 +476,10 @@ export default function App() {
 
               <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
                 {portfolioData.about.highlights.map((highlight, index) => {
-                  const Icon = highlightIcons[highlight.icon];
+                  const Icon =
+                    highlightIcons[
+                      highlight.icon as keyof typeof highlightIcons
+                    ];
                   return (
                     <div
                       key={index}
@@ -598,7 +611,6 @@ export default function App() {
           </div>
         </main>
 
-        {/* --- Footer & Kontak --- */}
         <footer className="text-center py-8 mt-16 md:mt-24">
           <AnimatedSection id="contact" className="pt-20">
             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -623,7 +635,6 @@ export default function App() {
           </div>
         </footer>
 
-        {/* --- Tombol Scroll to Top --- */}
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className={`fixed bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 ${
